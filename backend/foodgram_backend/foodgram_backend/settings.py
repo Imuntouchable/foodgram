@@ -8,7 +8,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fa06-8=zxi$bo#o1%k)f2z_^o%+*zvc9q6&4$oia0ld(n56tn('
 DEBUG = True
-ALLOWED_HOSTS = ['84.201.164.156', '127.0.0.1', 'localhost', 'teryllo.ddns.net'] 
+ALLOWED_HOSTS = ['84.201.164.156', '127.0.0.1', 'localhost', 'teryllo.hopto.org'] 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
