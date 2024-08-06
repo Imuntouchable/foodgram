@@ -1,9 +1,6 @@
-# backend/api/tests.py
 from http import HTTPStatus
 
 from django.test import Client, TestCase
-
-from api import models
 
 
 class APITestCase(TestCase):
@@ -24,4 +21,3 @@ class APITestCase(TestCase):
         """Проверка доступности списка рецептов."""
         response = self.guest_client.get('/api/recipes/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
