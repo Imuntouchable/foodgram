@@ -8,28 +8,11 @@ from rest_framework.fields import CurrentUserDefault
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.validators import UniqueValidator
 
-from .utils import (
-    LITERALS,
-    MIN_COOKING_TIME,
-    MAX_LENGTH_EMAIL,
-    MAX_LENGTH_USERNAME,
-    MAX_LENGTH_FIRST_NAME,
-    MAX_LENGTH_LAST_NAME,
-    MAX_LENGTH_PASSWORD,
-    validate_username
-)
-
-from .models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    RecipeTag,
-    ShoppingCart,
-    Subscription,
-    Tag,
-    User
-)
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, RecipeTag,
+                     ShoppingCart, Subscription, Tag, User)
+from .utils import (LITERALS, MAX_LENGTH_EMAIL, MAX_LENGTH_FIRST_NAME,
+                    MAX_LENGTH_LAST_NAME, MAX_LENGTH_PASSWORD,
+                    MAX_LENGTH_USERNAME, MIN_COOKING_TIME, validate_username)
 
 
 class CustomImageField(serializers.ImageField):

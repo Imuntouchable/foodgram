@@ -2,17 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from .utils import (
-    LITERALS,
-    MIN_COOKING_TIME,
-    MAX_LENGTH,
-    MAX_LENGTH_EMAIL,
-    MAX_LENGTH_SLUG,
-    MAX_LENGTH_USERNAME,
-    MAX_LENGTH_FIRST_NAME,
-    MAX_LENGTH_LAST_NAME,
-    validate_username
-)
+from .utils import (LITERALS, MAX_LENGTH, MAX_LENGTH_EMAIL,
+                    MAX_LENGTH_FIRST_NAME, MAX_LENGTH_LAST_NAME,
+                    MAX_LENGTH_SLUG, MAX_LENGTH_USERNAME, MIN_COOKING_TIME,
+                    validate_username)
 
 
 class User(AbstractUser):

@@ -12,28 +12,15 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    ShoppingCart,
-    Subscription,
-    Tag,
-    User
-)
-from .permisions import IsAuthorOrAdmin
-from .serializers import (
-    CustomUserSerializer,
-    IngredientSerializer,
-    PasswordChangeSerializer,
-    RecipeSerializer,
-    ShortRecipeSerializer,
-    SubscribedUserSerializer,
-    TagSerializer,
-    UsersSerializer
-)
-from .utils import FILENAME_OF_SHOPPING_LIST
 from .filters import RecipeFilter
+from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
+                     Tag, User)
+from .permisions import IsAuthorOrAdmin
+from .serializers import (CustomUserSerializer, IngredientSerializer,
+                          PasswordChangeSerializer, RecipeSerializer,
+                          ShortRecipeSerializer, SubscribedUserSerializer,
+                          TagSerializer, UsersSerializer)
+from .utils import FILENAME_OF_SHOPPING_LIST
 
 
 class CustomUserViewSet(UserViewSet):
