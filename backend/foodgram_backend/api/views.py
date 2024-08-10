@@ -184,7 +184,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -375,7 +375,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if 'ingredients' in data:
             for ingredient_data in data['ingredients']:
                 amount = ingredient_data.get('amount', 0)
-                if amount <= 0:
+                if int(amount) <= 0:
                     errors.setdefault(
                         "ingredients",
                         []

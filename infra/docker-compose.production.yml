@@ -2,6 +2,7 @@ version: '3.3'
 volumes:
   pg_data:
   static:
+  media:
 services:
   db:
     image: postgres:13.10
@@ -13,19 +14,19 @@ services:
     env_file: .env
     volumes:
       - static:/backend_static
+      - media:/media/
     depends_on:
       - db
   frontend:
     container_name: foodgram-front
     image: imuntouchable/foodgram_frontend
-    env_file: .env
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
-      - ../frontend/:/app/result_build/
   nginx:
     image: imuntouchable/foodgram_nginx
     volumes:
       - static:/staticfiles/
+      - media:/media/
     ports:
       - 80:80
