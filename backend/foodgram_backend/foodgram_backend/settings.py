@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-fa06-8=zxi$bo#o1%k)f2z_^o%+*zvc9q6&4$oia0ld(n56tn('
-DEBUG = True
-ALLOWED_HOSTS = ['84.201.164.156', '127.0.0.1', 'localhost', 'teryllo.hopto.org']
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG')
+ALLOWED_HOSTS = [os.getenv('IP'), os.getenv('HOST'), os.getenv('HOST_NAME'), os.getenv('DOMEN')]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

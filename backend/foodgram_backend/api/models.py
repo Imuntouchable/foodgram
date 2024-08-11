@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from .utils import (LITERALS, MAX_LENGTH, MAX_LENGTH_EMAIL,
                     MAX_LENGTH_FIRST_NAME, MAX_LENGTH_LAST_NAME,
@@ -59,7 +60,12 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Subscription'
         verbose_name_plural = 'Subscriptions'
-        unique_together = ('user', 'subscribed_to')
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'subscribed_to'],
+                name='unique_subscription'
+            )
+        ]
 
     def __str__(self):
         return f"{self.user} подписан на {self.subscribed_to}"
@@ -151,6 +157,12 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'RecipeIngredient'
         verbose_name_plural = 'RecipeIngredients'
+        constraints = [
+            UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_recipe_ingredient'
+            )
+        ]
 
     def __str__(self):
         return self.recipe
@@ -168,6 +180,12 @@ class RecipeTag(models.Model):
     class Meta:
         verbose_name = 'RecipeTag'
         verbose_name_plural = 'RecipeTags'
+        constraints = [
+            UniqueConstraint(
+                fields=['recipe', 'tag'],
+                name='unique_recipe_tag'
+            )
+        ]
 
     def __str__(self):
         return self.recipe
@@ -185,7 +203,9 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Favorite'
         verbose_name_plural = 'Favorites'
-        unique_together = ('user', 'recipe')
+        constraints = [
+            UniqueConstraint(fields=['user', 'recipe'], name='unique_favorite')
+        ]
 
     def __str__(self):
         return self.user
@@ -206,7 +226,12 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'ShoppingCart'
         verbose_name_plural = 'ShoppingCarts'
-        unique_together = ('user', 'recipe')
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shopping_cart'
+            )
+        ]
 
     def __str__(self):
         return self.user
