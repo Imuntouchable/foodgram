@@ -7,8 +7,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG')
-ALLOWED_HOSTS = [os.getenv('IP'), os.getenv('HOST'), os.getenv('HOST_NAME'), os.getenv('DOMEN')]
+DEBUG = bool(os.getenv('DEBUG'))
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split()
+print(ALLOWED_HOSTS)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -52,11 +53,10 @@ WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'Sasa.123321',
+        'PORT': 5432
     }
 }
 AUTH_PASSWORD_VALIDATORS = [
