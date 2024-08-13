@@ -215,34 +215,27 @@ class RecipeViewSet(viewsets.ModelViewSet, ActionMixin):
         url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
-        user = request.user
         ingredients = RecipeIngredient.objects.filter(
-            recipe__shoppingcart__user=user
-        ).values(
-            'ingredient__id',
-            'ingredient__name',
-            'ingredient__measurement_unit'
-        ).annotate(total_amount=sum('amount'))
-
-        if not ingredients.exists():
-            return Response(
-                {'detail': 'Корзина пуста.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        shopping_list = '\n'.join(
-            [
-                f'''{ingredient["ingredient__id"]}
-                {ingredient["ingredient__name"]}
-                {ingredient["ingredient__measurement_unit"]}
-                {ingredient["total_amount"]}'''
-                for ingredient in ingredients
-            ]
+            recipe__shopping_recipe__user=request.user
         )
-        response = HttpResponse(shopping_list, content_type='text/plain')
-        response[
-            'Content-Disposition'
-        ] = 'attachment; filename="shopping_list.txt"'
+        shopping_data = {}
+        for ingredient in ingredients:
+            if str(ingredient.ingredient) in shopping_data:
+                shopping_data[
+                    f'{str(ingredient.ingredient)}'
+                ] += ingredient.amount
+            else:
+                shopping_data[
+                    f'{str(ingredient.ingredient)}'
+                ] = ingredient.amount
+        filename = "shopping-list.txt"
+        content = ''
+        for ingredient, amount in shopping_data.items():
+            content += f"{ingredient} - {amount};\n"
+        response = HttpResponse(content, content_type='text/plain',
+                                status=status.HTTP_200_OK)
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(
+            filename)
         return response
 
     @action(
