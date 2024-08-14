@@ -159,6 +159,11 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     http_method_names = ['get', 'post']
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
@@ -166,6 +171,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name',)
     http_method_names = ['get']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class RecipeViewSet(viewsets.ModelViewSet, ActionMixin):
