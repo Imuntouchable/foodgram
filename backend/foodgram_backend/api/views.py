@@ -2,7 +2,9 @@ import base64
 
 import pyshorteners
 from django.core.files.base import ContentFile
+from django.db.models import Sum
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
@@ -18,9 +20,9 @@ from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           PasswordChangeSerializer, RecipeSerializer,
-                          ShortRecipeSerializer, SubscribedUserSerializer,
-                          TagSerializer, UserCreateResponseSerializer,
-                          UsersSerializer)
+                          ShoppingCardSerializer, ShortRecipeSerializer,
+                          SubscribedUserSerializer, TagSerializer,
+                          UserCreateResponseSerializer, UsersSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -191,60 +193,85 @@ class RecipeViewSet(viewsets.ModelViewSet, ActionMixin):
         url_path='get-link'
     )
     def get_link(self, request, pk=None):
-        recipe = self.get_object()
-        url = request.build_absolute_uri(f'/api/recipes/{recipe.id}/')
-        s = pyshorteners.Shortener()
-        try:
-            short_url = s.tinyurl.short(url)
-            return Response({"short-link": short_url})
-        except Exception as e:
+        shortener = pyshorteners.Shortener()
+        short_url = shortener.tinyurl.short(
+            request.build_absolute_uri()
+            .replace('/api', '')
+            .replace('/get-link', '')
+        )
+        return Response({'short-link': short_url})
+
+    @staticmethod
+    def destroy_shopping_cart_favorite(id_to_delete, user, model):
+        recipe_to_delete = get_object_or_404(Recipe, id=id_to_delete)
+        deleted, _ = model.objects.filter(
+            author=user, recipe=recipe_to_delete
+        ).delete()
+        if not deleted:
             return Response(
-                {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {'detail': 'recipe is missing'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def add_to_shopping_cart_favorite(serializer, pk, request):
+        get_object_or_404(Recipe, id=pk)
+        serializer = serializer(
+            data={
+                'recipe': pk,
+                'author': request.user.id,
+            },
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated],
-        url_path='shopping_cart'
+        methods=('post',),
+        permission_classes=(IsAuthenticated,),
+        url_path='shopping_cart',
     )
-    def shopping_cart(self, request, pk=None):
-        return self.handle_action(
-            model=ShoppingCart,
-            serializer_class=ShortRecipeSerializer,
-            request=request,
-            recipe=self.get_object()
+    def add_to_shopping_cart(self, request, pk):
+        return self.add_to_shopping_cart_favorite(
+            ShoppingCardSerializer, pk, request
+        )
+
+    @add_to_shopping_cart.mapping.delete
+    def delete_from_shopping_cart(self, request, pk):
+        return self.destroy_shopping_cart_favorite(
+            pk, request.user, ShoppingCart
         )
 
     @action(
         detail=False,
-        methods=['get'],
         permission_classes=[IsAuthenticated],
+        methods=['get'],
         url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
+        user = request.user
         ingredients = RecipeIngredient.objects.filter(
-            recipe__shopping_recipe__user=request.user
+            recipe__shopping_cart__user=request.user
+        ).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(amount=Sum('amount'))
+        shopping_list = (
+            f'Список покупок для: {user.get_full_name()}\n\n'
         )
-        shopping_data = {}
-        for ingredient in ingredients:
-            if str(ingredient.ingredient) in shopping_data:
-                shopping_data[
-                    f'{str(ingredient.ingredient)}'
-                ] += ingredient.amount
-            else:
-                shopping_data[
-                    f'{str(ingredient.ingredient)}'
-                ] = ingredient.amount
-        filename = "shopping-list.txt"
-        content = ''
-        for ingredient, amount in shopping_data.items():
-            content += f"{ingredient} - {amount};\n"
-        response = HttpResponse(content, content_type='text/plain',
-                                status=status.HTTP_200_OK)
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(
-            filename)
+        shopping_list += '\n'.join([
+            f'- {ingredient["ingredient__name"]} '
+            f'({ingredient["ingredient__measurement_unit"]})'
+            f' - {ingredient["amount"]}'
+            for ingredient in ingredients
+        ])
+        filename = f'{user.username}_shopping_list.txt'
+        response = HttpResponse(
+            shopping_list, content_type='text.txt; charset=utf-8'
+        )
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
 
     @action(
