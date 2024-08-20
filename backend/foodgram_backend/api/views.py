@@ -1,7 +1,6 @@
 import base64
 
 import pyshorteners
-from django.db.models import Sum
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -14,8 +13,8 @@ from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .mixins import ActionMixin
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     ShoppingCart, Subscription, Tag, User)
+from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
+                     Tag, User)
 from .pagination import CustomPageNumberPagination
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
