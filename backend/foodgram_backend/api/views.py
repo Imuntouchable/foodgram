@@ -1,6 +1,7 @@
 import base64
 
 import pyshorteners
+from django.db.models import Sum
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -226,27 +227,40 @@ class RecipeViewSet(viewsets.ModelViewSet, ActionMixin):
         url_path='download_shopping_cart'
     )
     def download_shopping_cart(self, request):
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__shopping_recipe__user=request.user
-        )
+        recipes = Recipe.objects.filter(
+            shoppingcart__user=request.user
+        ).prefetch_related('recipe_ingredients__ingredient')
         shopping_data = {}
-        for ingredient in ingredients:
-            if str(ingredient.ingredient) in shopping_data:
-                shopping_data[
-                    f'{str(ingredient.ingredient)}'
-                ] += ingredient.amount
-            else:
-                shopping_data[
-                    f'{str(ingredient.ingredient)}'
-                ] = ingredient.amount
+        recipe_list = []
+        for recipe in recipes:
+            recipe_details = f"\n{recipe.name}:\n"
+            recipe_ingredients = recipe.recipe_ingredients.all()
+            for recipe_ingredient in recipe_ingredients:
+                name = recipe_ingredient.ingredient.name
+                measurement_unit = (
+                    recipe_ingredient.ingredient.measurement_unit
+                )
+                amount = recipe_ingredient.amount
+                recipe_details += f"  {name} - {amount} {measurement_unit}\n"
+                if name in shopping_data:
+                    shopping_data[name]['amount'] += amount
+                else:
+                    shopping_data[name] = {
+                        'measurement_unit': measurement_unit,
+                        'amount': amount
+                    }
+            recipe_list.append(recipe_details)
         filename = "shopping-list.txt"
-        content = ''
-        for ingredient, amount in shopping_data.items():
-            content += f"{ingredient} - {amount};\n"
+        content = "\n".join(recipe_list)
+        content += "\nShopping List:\n"
+        for ingredient, data in shopping_data.items():
+            content += (
+                f"{ingredient} - {data['amount']} {data['measurement_unit']};"
+            )
+            content += "\n"
         response = HttpResponse(content, content_type='text/plain',
                                 status=status.HTTP_200_OK)
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(
-            filename)
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
 
     @action(
