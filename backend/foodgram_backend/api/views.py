@@ -11,7 +11,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .mixins import ActionMixin
 from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
                      Tag, User)
