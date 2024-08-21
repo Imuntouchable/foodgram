@@ -48,15 +48,11 @@ class UserViewSet(viewsets.ModelViewSet, ActionMixin):
         permission_classes=[IsAuthenticated],
         url_path='subscriptions'
     )
-    def subscriptions(self, request, pk=None):
+    def subscriptions(self, request):
         user = request.user
-        subscribed_user_ids = Subscription.objects.filter(
-            user=user
-        ).values_list('subscribed_to_id', flat=True)
-        subscribed_users = User.objects.filter(id__in=subscribed_user_ids)
-        recipes = Recipe.objects.filter(author__in=subscribed_users)
-        pages = self.paginate_queryset(recipes)
-        serializer = RecipeSerializer(
+        queryset = User.objects.filter(subscribers__user=user)
+        pages = self.paginate_queryset(queryset)
+        serializer = SubscribedUserSerializer(
             pages,
             many=True,
             context={'request': request}
