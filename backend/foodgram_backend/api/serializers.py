@@ -281,7 +281,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ).data
         representation['ingredients'] = ingredients_representation
         tag_representation = RecipeTagSerializer(
-            instance.recipe_tags.all(),
+            instance.recipe_tags__tag.all(),
             many=True
         ).data
         representation['tags'] = tag_representation
@@ -295,13 +295,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients', [])
-        tags = validated_data.pop('tags', [])
+        ingredients_data = validated_data.pop('ingredients', [])
+        tags_data = validated_data.pop('tags', [])
+        if ingredients_data:
+            RecipeIngredient.objects.filter(recipe=instance).delete()
+        if tags_data:
+            RecipeTag.objects.filter(recipe=instance).delete()
         instance = super().update(instance, validated_data)
-        instance.tags.clear()
-        instance.tags.set(tags)
-        instance.ingredients.clear()
-        self.create_or_update(instance, ingredients, tags)
+        self.create_or_update(instance, ingredients_data, tags_data)
         return instance
 
     def create_or_update(self, recipe, ingredients_data, tags_data):
