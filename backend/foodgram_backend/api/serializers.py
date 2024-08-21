@@ -281,7 +281,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ).data
         representation['ingredients'] = ingredients_representation
         tag_representation = RecipeTagSerializer(
-            instance.recipe_tags__tag.all(),
+            instance.recipe_tags.all(),
             many=True
         ).data
         representation['tags'] = tag_representation
