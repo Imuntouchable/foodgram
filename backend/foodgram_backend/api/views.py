@@ -54,8 +54,9 @@ class UserViewSet(viewsets.ModelViewSet, ActionMixin):
             user=user
         ).values_list('subscribed_to_id', flat=True)
         subscribed_users = User.objects.filter(id__in=subscribed_user_ids)
-        pages = self.paginate_queryset(subscribed_users)
-        serializer = SubscribedUserSerializer(
+        recipes = Recipe.objects.filter(author__in=subscribed_users)
+        pages = self.paginate_queryset(recipes)
+        serializer = RecipeSerializer(
             pages,
             many=True,
             context={'request': request}
