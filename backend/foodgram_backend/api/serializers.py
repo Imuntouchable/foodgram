@@ -298,6 +298,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients', [])
         tags_data = validated_data.pop('tags', [])
         instance = super().update(instance, validated_data)
+        instance = super().update(instance, validated_data)
+        instance.tags_data.clear()
+        instance.tags_data.set(tags_data)
+        instance.ingredients_data.clear()
         self.create_or_update(instance, ingredients_data, tags_data)
         return instance
 
