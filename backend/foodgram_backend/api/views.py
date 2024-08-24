@@ -14,7 +14,7 @@ from .filters import IngredientFilter, RecipeFilter
 from .mixins import ActionMixin
 from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
                      Tag, User)
-from .pagination import CustomLimitOffsetPagination, CustomPageNumberPagination
+from .pagination import CustomPageNumberPagination
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           PasswordChangeSerializer, RecipeSerializer,
@@ -31,7 +31,7 @@ class CustomUserViewSet(UserViewSet):
 class UserViewSet(viewsets.ModelViewSet, ActionMixin):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    pagination_class = CustomLimitOffsetPagination
+    pagination_class = CustomPageNumberPagination
     http_method_names = ('get', 'post', 'delete', 'patch', 'put')
 
     def create(self, request, *args, **kwargs):
