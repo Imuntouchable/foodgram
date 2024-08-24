@@ -14,7 +14,7 @@ from .filters import IngredientFilter, RecipeFilter
 from .mixins import ActionMixin
 from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
                      Tag, User)
-from .pagination import CustomLimitOffsetPagination, CustomPageNumberPagination
+from .pagination import CustomLimitOffsetPagination
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           PasswordChangeSerializer, RecipeSerializer,
@@ -178,7 +178,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet, ActionMixin):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = CustomPageNumberPagination
+    pagination_class = CustomLimitOffsetPagination
     permission_classes = (IsAuthorOrAdmin,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
