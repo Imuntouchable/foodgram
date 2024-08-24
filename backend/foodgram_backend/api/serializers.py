@@ -275,15 +275,24 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        ingredients_representation = RecipeIngredientSerializer(
-            instance.recipe_ingredients.all(),
-            many=True
-        ).data
+        ingredients_representation = [
+            {
+                'id': ingredient.ingredient.id,
+                'name': ingredient.ingredient.name,
+                'measurement_unit': ingredient.ingredient.measurement_unit,
+                'amount': ingredient.amount
+            }
+            for ingredient in instance.recipe_ingredients.all()
+        ]
         representation['ingredients'] = ingredients_representation
-        tag_representation = RecipeTagSerializer(
-            instance.recipe_tags.all(),
-            many=True
-        ).data
+        tag_representation = [
+            {
+                'id': tag.tag.id,
+                'slug': tag.tag.slug,
+                'name': tag.tag.name
+            }
+            for tag in instance.recipe_tags.all()
+        ]
         representation['tags'] = tag_representation
         return representation
 
