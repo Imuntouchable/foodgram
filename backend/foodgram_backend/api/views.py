@@ -7,7 +7,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -15,7 +14,7 @@ from .filters import IngredientFilter, RecipeFilter
 from .mixins import ActionMixin
 from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
                      Tag, User)
-from .pagination import CustomPageNumberPagination, CustomLimitOffsetPagination
+from .pagination import CustomLimitOffsetPagination, CustomPageNumberPagination
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           PasswordChangeSerializer, RecipeSerializer,
