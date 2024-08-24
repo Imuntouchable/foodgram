@@ -14,7 +14,7 @@ from .filters import IngredientFilter, RecipeFilter
 from .mixins import ActionMixin
 from .models import (Favorite, Ingredient, Recipe, ShoppingCart, Subscription,
                      Tag, User)
-from .pagination import CustomLimitOffsetPagination, CustomPageNumberPagination
+from .pagination import CustomPageNumberPagination, CustomLimitOffsetPagination
 from .permisions import IsAuthorOrAdmin
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           PasswordChangeSerializer, RecipeSerializer,
