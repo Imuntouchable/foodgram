@@ -357,7 +357,7 @@ class SubscribedUserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         all_recipes = Recipe.objects.filter(author=instance)
-        representation['recipes_count'] = all_recipes.count()
+        representation['recipes_count'] = 999
         recipes_limit = self.context[
             'request'
         ].query_params.get('recipes_limit')
