@@ -356,18 +356,19 @@ class SubscribedUserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        recipes = Recipe.objects.filter(author=instance)
-        recipes_limit = self.context['request'].query_params.get(
-            'recipes_limit'
-        )
+        all_recipes = Recipe.objects.filter(author=instance)
+        representation['recipes_count'] = all_recipes.count()
+        recipes_limit = self.context[
+            'request'
+        ].query_params.get('recipes_limit')
         if recipes_limit:
-            recipes = recipes[:int(recipes_limit)]
+            all_recipes = all_recipes[:int(recipes_limit)]
         recipes_representation = ShortRecipeSerializer(
-            recipes, many=True,
+            all_recipes,
+            many=True,
             context=self.context
         ).data
         representation['recipes'] = recipes_representation
-        representation['recipes_count'] = recipes.count()
         if instance.avatar:
             representation['avatar'] = instance.avatar.url
         else:
